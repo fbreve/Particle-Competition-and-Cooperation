@@ -6,11 +6,13 @@
 %
 % Loading the Wine Data Set
 load wine.data
-% Getting the dataset attributes (all colums, except the first one)
+% Getting the dataset attributes (all colums, except the first one).
 X = wine(:,2:end);
-% Getting dataset labels (first column)
+% Getting dataset labels (first column). Labels should be >0 and in
+% sequence. Ex.: 1, 2, 3.
 label = wine(:,1);
 % Randomly selecting 10% of the labels to be presented to the algorithm.
+% An unlabeled item is represented by 0.
 slabel = slabelgen(label,0.1);
 disp('Running the algorithm MEX implementation, which is ~10 times faster than the pure Matlab implementation.');
 disp('Parameters k: 10, distance: Normalized Euclidean, others: Default.');
