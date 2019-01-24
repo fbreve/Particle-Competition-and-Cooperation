@@ -1,5 +1,3 @@
-// Atenção: atualizar scripts que usam este programa para que passem corretamente as variáveis tipadas
-
 /*=================================================================
  *
  *ESCALARES (int): maxiter, npart, nclass, stopmax
@@ -9,7 +7,6 @@
  *
  *MATRIZES: distnode, pot, nlist
  *
- *RETORNO: pot
  *=================================================================*/
 #include <math.h>
 #include "mex.h"
