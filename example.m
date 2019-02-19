@@ -14,7 +14,7 @@ label = wine(:,1);
 % Randomly selecting 10% of the labels to be presented to the algorithm.
 % An unlabeled item is represented by 0.
 slabel = slabelgen(label,0.1);
-disp('Running the algorithm MEX implementation, which is ~10 times faster than the pure Matlab implementation.');
+disp('Running the algorithm MEX implementation, which is ~10 times faster than the pure Matlab implementation...');
 disp('Parameters k: 10, distance: Normalized Euclidean, others: Default.');
 tStart = tic;
 owner = pccmex(X, slabel, 10, 'seuclidean');
@@ -22,7 +22,7 @@ tElapsed = toc(tStart);
 % Evaluating the classification accuracy.
 acc = stmwevalk(label,slabel,owner);
 fprintf('Classification accuracy: %0.4f - Execution Time: %0.4fs\n\n',acc,tElapsed);
-disp('Running the algorithm in its pure Matlab implementation')
+disp('Running the algorithm in its pure Matlab implementation...')
 disp('Parameters k: 10, distance: Normalized Euclidean, others: Default.');
 tStart = tic;
 owner = pcc(X, slabel, 10, 'seuclidean');
