@@ -2,7 +2,7 @@
 % applied to the Wine Data Set from the UCI Machine Learning Repository
 % Available at: https://archive.ics.uci.edu/ml/datasets/wine
 %
-% by Fabricio Breve - 21/01/2019
+% by Fabricio Breve - 12/03/2019
 %
 % Loading the Wine Data Set
 load wine.data
@@ -14,21 +14,31 @@ label = wine(:,1);
 % Randomly selecting 10% of the labels to be presented to the algorithm.
 % An unlabeled item is represented by 0.
 slabel = slabelgen(label,0.1);
-disp('Running the algorithm MEX implementation, which is ~10 times faster than the pure Matlab implementation...');
-disp('Parameters k: 10, distance: Normalized Euclidean, others: Default.');
-tStart = tic;
-owner = pccmex(X, slabel, 10, 'seuclidean');
-tElapsed = toc(tStart);
-% Evaluating the classification accuracy.
-acc = stmwevalk(label,slabel,owner);
-fprintf('Classification accuracy: %0.4f - Execution Time: %0.4fs\n\n',acc,tElapsed);
+% Setting the k parameter (k-nearest neighbors)
+k = 10;
+
 disp('Running the algorithm in its pure Matlab implementation...')
 disp('Parameters k: 10, distance: Normalized Euclidean, others: Default.');
 tStart = tic;
-owner = pcc(X, slabel, 10, 'seuclidean');
+owner = pcc(X, slabel, k, 'seuclidean');
 tElapsed = toc(tStart);
 % Evaluating the classification accuracy.
 acc = stmwevalk(label,slabel,owner);
 fprintf('Classification accuracy: %0.4f - Execution Time: %0.4fs\n\n',acc,tElapsed);
-disp('Notice that classification accuracy may vary between the two different implementations and among successive executions.');
-disp('This is expected behavior due to the algorithm''s stochastic nature.');
+
+% The mex implementation needs pccloop.c. It is pre-compiled for Win64. 
+% If you have other operating system you need to compile it yourself using:  
+% mex pccloop.c
+
+disp('Running the algorithm MEX implementation, which is ~10 times faster than the pure Matlab implementation...');
+disp('Parameters k: 10, distance: Normalized Euclidean, others: Default.');
+tStart = tic;
+owner = pccmex(X, slabel, k, 'seuclidean');
+tElapsed = toc(tStart);
+% Evaluating the classification accuracy.
+acc = stmwevalk(label,slabel,owner);
+fprintf('Classification accuracy: %0.4f - Execution Time: %0.4fs\n\n',acc,tElapsed);
+
+% Notice that classification accuracy may vary between the two different 
+% implementations and among successive executions.
+% This is expected behavior due to the algorithm''s stochastic nature.
