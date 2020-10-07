@@ -67,7 +67,7 @@ function [owner, pot, owndeg, distnode] = pcc(X, slabel, k, disttype, valpha, pg
     potmax = 1.000; % potencial máximo
     potmin = 0.000; % potencial mínimo
     npart = sum(slabel~=0); % quantidade de partículas
-    stopmax = round((qtnode/npart)*round(valpha*0.1)); % qtde de iterações para verificar convergência    
+    stopmax = round((qtnode/(npart*k))*round(valpha*0.1)); % qtde de iterações para verificar convergência    
     % normalizar atributos se necessário
     if strcmp(disttype,'seuclidean')==1
         X = zscore(X);
@@ -121,6 +121,8 @@ function [owner, pot, owndeg, distnode] = pcc(X, slabel, k, disttype, valpha, pg
     owndeg = repmat(realmin,qtnode,nclass);  % não podemos usar 0, porque nós não visitados dariam divisão por 0
     % variável para guardar máximo potencial mais alto médio
     maxmmpot = 0;
+    % counter of how much times the stop criterion checked positive
+    stopcnt = 0;
     for i=1:maxiter
         % para cada partícula
         rndtb = unifrnd(0,1,npart,1);  % probabilidade pdet

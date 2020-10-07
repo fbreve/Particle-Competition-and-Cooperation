@@ -72,7 +72,7 @@ function [owner, pot, owndeg] = pccmex(X, slabel, k, disttype, valpha, pgrd, del
     potmax = 1.000; % potencial máximo
     potmin = 0.000; % potencial mínimo
     npart = sum(slabel~=0); % quantidade de partículas
-    stopmax = round((qtnode/npart)*round(valpha*0.1)); % qtde de iterações para verificar convergência    
+    stopmax = round((qtnode/(npart*k))*round(valpha*0.1)); % qtde de iterações para verificar convergência    
     % normalizar atributos se necessário
     if strcmp(disttype,'seuclidean')==1
         X = zscore(X);

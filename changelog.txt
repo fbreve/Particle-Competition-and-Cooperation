@@ -1,0 +1,9 @@
+Date Format: DD/MM/YY
+
+07/10/2020:
+- Changed the stop criterion to be less conservative. It now considers the
+amount of nodes, the amound of particles and also the amount of k-nearest 
+neighbors in the graph construction to calculate how many iterations it 
+should wait on the "stable" phase before it stops. k-nearest neighbors gives a
+clue on how connected the network is, we usually need less "stable" iterations
+in more connected networks.

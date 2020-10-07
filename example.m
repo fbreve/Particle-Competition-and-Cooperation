@@ -20,7 +20,7 @@ k = 10;
 disp('Running the algorithm in its pure Matlab implementation...')
 disp('Parameters k: 10, distance: Normalized Euclidean, others: Default.');
 tStart = tic;
-owner = pcc(X, slabel, k, 'seuclidean');
+owner = pcc(X, slabel, k, 'seuclidean', 200);
 tElapsed = toc(tStart);
 % Evaluating the classification accuracy.
 acc = stmwevalk(label,slabel,owner);
@@ -33,7 +33,7 @@ fprintf('Classification accuracy: %0.4f - Execution Time: %0.4fs\n\n',acc,tElaps
 disp('Running the algorithm MEX implementation, which is ~10 times faster than the pure Matlab implementation...');
 disp('Parameters k: 10, distance: Normalized Euclidean, others: Default.');
 tStart = tic;
-owner = pccmex(X, slabel, k, 'seuclidean');
+owner = pccmex(X, slabel, k, 'seuclidean', 200);
 tElapsed = toc(tStart);
 % Evaluating the classification accuracy.
 acc = stmwevalk(label,slabel,owner);
