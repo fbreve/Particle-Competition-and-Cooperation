@@ -81,11 +81,16 @@ void mexFunction( int nlhs, mxArray *plhs[],
     neibmax = (int) mxGetN(nlist_IN);  // quantidade máxima de vizinhos que um nó tem   
            
     // non-Windows users should probably use /dev/random or /dev/urandom instead of rand_s
-    unsigned int seed;
-    errno_t err;
-    err = rand_s(&seed);
-    if (err != 0) printf_s("The rand_s function failed!\n");
-    srand(seed);
+    //unsigned int seed;
+    //errno_t err;
+    //err = rand_s(&seed);
+    //if (err != 0) printf_s("The rand_s function failed!\n");
+    //srand(seed);
+    
+    /* removed rand_s and changed for a fixed seed for reproducibility using MATLAB rng()
+       this produce the same results for the same rng() seed but still produce different
+       results for subsequent runs without re-seeding */
+    srand(1980); 
     double maxmmpot = 0;
     int stopcnt = 0;
     double *prob = malloc(sizeof(double)*neibmax); // vetor de probabilidades de visitar vizinho    
