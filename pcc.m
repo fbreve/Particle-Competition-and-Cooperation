@@ -169,7 +169,7 @@ function [owner, pot, owndeg, distnode] = pcc(X, slabel, k, disttype, valpha, pg
                 stopcnt = 0;
             else    
                 stopcnt = stopcnt + 1;
-                if stopcnt > stopmax                     
+                if stopcnt > stopmax
                     break;
                 end
             end

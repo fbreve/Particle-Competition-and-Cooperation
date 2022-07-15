@@ -1,9 +1,14 @@
-% Gerador de slabel (nós rotulados = classe, nós não rotulados = 0)
-% Garante pelo menos 1 nó rotulado por classe
-% slabel = slabelgen(label,amount);
-% label = label list
-% amount = [0 1] percentage of pre-labeled samples
-% Uso: slabel = slabelgen(label,amount)
+% Slabel Generator receives a vector where each element is a class number 
+% (>0) and it outputs the same vector changing some labels to zero 
+% (representing the unlabeled elements a classifier will estimate)
+% It guarantees at least one labeled node per class
+%
+% Usage: slabel = slabelgen(label,amount);
+% label = vector where each element is the label of an element represented
+% by positive integers (1, 2, 3, ...)
+% amount = [0 1] percentage of pre-labeled samples. Example: use 0.1 to 
+% keep 10% of the labels unchanged and change the other 90% to zero.
+
 function slabel = slabelgen(label,amount)
     qtnode = size(label,1);    
     slabel = zeros(qtnode,1);
