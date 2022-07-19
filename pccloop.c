@@ -33,6 +33,7 @@ extern errno_t rand_s (unsigned int *randomValue);
 #define nlist_IN        prhs[15]
 #define pot_IN          prhs[16]
 #define owndeg_IN       prhs[17]
+#define seed_IN         prhs[18]
 
 void mexFunction( int nlhs, mxArray *plhs[], 
 		  int nrhs, const mxArray*prhs[] )    
@@ -47,13 +48,13 @@ void mexFunction( int nlhs, mxArray *plhs[],
     unsigned int *nlist; // matrizes de int
     unsigned char *distnode;
     double *pot, *owndeg;  // matrizes de double
-    int qtnode, neibmax;
+    int qtnode, neibmax, seed;
     
     /* Check for proper number of arguments */
     
     
-    if (nrhs != 18) { 
-	    mexErrMsgTxt("18 input arguments are required."); 
+    if (nrhs != 19) { 
+	    mexErrMsgTxt("19 input arguments are required."); 
     } else if (nlhs > 0) {
 	    mexErrMsgTxt("This function no longer uses output arguments."); 
     }
@@ -62,6 +63,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
     npart = (int) mxGetScalar(npart_IN);
     nclass = (int) mxGetScalar(nclass_IN);
     stopmax = (int) mxGetScalar(stopmax_IN);
+    seed = (int) mxGetScalar(seed_IN);
     pgrd = mxGetScalar(pgrd_IN);
     dexp = mxGetScalar(dexp_IN);
     deltav = mxGetScalar(deltav_IN);
@@ -75,22 +77,21 @@ void mexFunction( int nlhs, mxArray *plhs[],
     distnode = (unsigned char *) mxGetData(distnode_IN);
     nlist = (unsigned int *) mxGetData(nlist_IN);    
     pot = mxGetPr(pot_IN);
-    owndeg = mxGetPr(owndeg_IN);
+    owndeg = mxGetPr(owndeg_IN);    
     
     qtnode = (int) mxGetM(slabel_IN);
     neibmax = (int) mxGetN(nlist_IN);  // quantidade máxima de vizinhos que um nó tem   
            
     // non-Windows users should probably use /dev/random or /dev/urandom instead of rand_s
     //unsigned int seed;
-    //errno_t err;
-    //err = rand_s(&seed);
-    //if (err != 0) printf_s("The rand_s function failed!\n");
-    //srand(seed);
-    
-    /* removed rand_s and changed for a fixed seed for reproducibility using MATLAB rng()
-       this produce the same results for the same rng() seed but still produce different
-       results for subsequent runs without re-seeding */
-    srand(1980); 
+    if (seed<0)
+    {
+        errno_t err;
+        err = rand_s(&seed);
+        if (err != 0) printf_s("The rand_s function failed!\n");
+    }
+    srand(seed);
+
     double maxmmpot = 0;
     int stopcnt = 0;
     double *prob = malloc(sizeof(double)*neibmax); // vetor de probabilidades de visitar vizinho    

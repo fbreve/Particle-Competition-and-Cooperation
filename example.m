@@ -16,13 +16,11 @@ label = wine(:,1);
 % with their labels. An unlabeled item is represented by 0.
 disp(['Randomly selecting 10% of the elements to be presented to the algorithm with their labels...' newline]);
 slabel = slabelgen(label,0.1);
-% Setting the k parameter (k-nearest neighbors)
-k = 10;
 
 disp('Running the algorithm in its pure Matlab implementation...')
 disp('Parameters k: 10, distance: Normalized Euclidean, others: Default.');
 tStart = tic;
-owner = pcc(X, slabel, k, 'seuclidean');
+owner = pcc(X, slabel, k=10, disttype='seuclidean', mex=false);
 tElapsed = toc(tStart);
 % Evaluating the classification accuracy.
 acc = stmwevalk(label,slabel,owner);
@@ -39,7 +37,7 @@ disp(cm);
 disp('Running the algorithm MEX implementation, which is ~10 times faster than the pure Matlab implementation...');
 disp('Parameters k: 10, distance: Normalized Euclidean, others: Default.');
 tStart = tic;
-owner = pccmex(X, slabel, k, 'seuclidean');
+owner = pcc(X, slabel, k=10, disttype='seuclidean', mex=true);
 tElapsed = toc(tStart);
 % Evaluating the classification accuracy.
 acc = stmwevalk(label,slabel,owner);
