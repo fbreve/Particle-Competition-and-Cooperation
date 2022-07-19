@@ -1,5 +1,10 @@
 Date Format: DD/MM/YY
 
+19/07/2022:
+1) Options are now labeled arguments. Matlab R2019b or higher is required.
+2) seed option to allow reproducibility. Default is no seed.
+3) pccmex and pcc joined in a single function, an option is used to choose between them. Mex is the default one.
+
 07/10/2020:
 - Changed the stop criterion to be less conservative. It now considers the
 amount of nodes, the amound of particles and also the amount of k-nearest 
