@@ -9,7 +9,7 @@
 % Knowledge and Data Engineering, IEEE Transactions on , vol.24, no.9, pp.1686,1698, Sept. 2012
 % doi: 10.1109/TKDE.2011.119
 %
-% Usage: [owner, pot, owndeg] = pccmex(X, slabel, k, disttype, valpha, pgrd, deltav, deltap, dexp, nclass, maxiter)
+% Usage: [owner, pot, owndeg, distnode] = pcc(X, slabel, k, disttype, valpha, pgrd, deltav, deltap, dexp, nclass, maxiter)
 % INPUT:
 % X         - Matrix where each line is a data item and each column is an attribute
 % slabel    - vector where each element is the label of the corresponding
@@ -27,6 +27,8 @@
 % OUTPUT:
 % owner     - vector of classes assigned to each data item
 % owndeg    - fuzzy output as in [2], each line is a data item, each column pertinence to a class
+% distnode  - matrix with the distance vectors of each particle, each
+%             column is a particle and each line is a node
 %
 % [1] Breve, Fabricio Aparecido; Zhao, Liang; Quiles, Marcos Gonçalves; Pedrycz, Witold; Liu, Jiming, 
 % "Particle Competition and Cooperation in Networks for Semi-Supervised Learning," 
@@ -36,7 +38,7 @@
 % [2] Breve, Fabricio Aparecido; ZHAO, Liang. 
 % "Fuzzy community structure detection by particle competition and cooperation."
 % Soft Computing (Berlin. Print). , v.17, p.659 - 673, 2013.
-function [owner, pot, owndeg] = pccmex(X, slabel, k, disttype, valpha, pgrd, deltav, deltap, dexp, nclass, maxiter)
+function [owner, pot, owndeg, distnode] = pccmex(X, slabel, k, disttype, valpha, pgrd, deltav, deltap, dexp, nclass, maxiter)
     if (nargin < 11) || isempty(maxiter)
         maxiter = 500000; % número de iterações
     end

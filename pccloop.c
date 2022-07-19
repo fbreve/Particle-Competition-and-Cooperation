@@ -53,9 +53,9 @@ void mexFunction( int nlhs, mxArray *plhs[],
     
     
     if (nrhs != 18) { 
-	    mexErrMsgTxt("18 argumentos de entrada requeridos."); 
+	    mexErrMsgTxt("18 input arguments are required."); 
     } else if (nlhs > 0) {
-	    mexErrMsgTxt("Esta função não usa mais argumentos de saída."); 
+	    mexErrMsgTxt("This function no longer uses output arguments."); 
     }
     
     maxiter = (int) mxGetScalar(maxiter_IN);

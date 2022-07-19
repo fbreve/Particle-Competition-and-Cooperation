@@ -25,6 +25,8 @@
 % OUTPUT:
 % owner     - vector of classes assigned to each data item
 % owndeg    - fuzzy output as in [2], each line is a data item, each column pertinence to a class
+% distnode  - matrix with the distance vectors of each particle, each
+%             column is a particle and each line is a node
 %
 % [1] Breve, Fabricio Aparecido; Zhao, Liang; Quiles, Marcos Gonçalves; Pedrycz, Witold; Liu, Jiming, 
 % "Particle Competition and Cooperation in Networks for Semi-Supervised Learning," 
