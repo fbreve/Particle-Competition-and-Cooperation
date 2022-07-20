@@ -31,10 +31,15 @@
 % mex       - Uses the mex version of the code (compiled binary) which is
 %             ~10 times faster. Default: true. Set to false to use the 
 %             Matlab only version.
-% seed      - If seed is a nonnegative integer, it will be used to itialize
-%             the random number generator, which is rng() or rand_s() 
-%             in non-mex and mex versions, respectively. Use a seed if you
-%             want reproducible results.
+% useseed   - Set to true if you want to use a seed to allow reproducible
+%             results. Default: false. Remember to set the seed with the
+%             seed option.
+% seed      - Seed to itialize the random number generator, which is rng()
+%             or rand_s() in non-mex and mex versions, respectively. 
+%             Default: 0. Remember to set the option useseed to true
+%             if you want the provided seed to be used. 
+% Xgraph    - Set to true if X is a pre-built graph instead of a feature
+%             matrix.
 %
 % OUTPUT:
 % owner     - vector of classes assigned to each data item
@@ -55,7 +60,7 @@
 
 function [owner, pot, owndeg, distnode] = pcc(X, slabel, options)
     arguments
-        X double
+        X 
         slabel uint16
         options.k uint16 = size(X,1)*0.05
         options.disttype string = 'euclidean'
@@ -67,71 +72,66 @@ function [owner, pot, owndeg, distnode] = pcc(X, slabel, options)
         options.nclass uint16 = max(slabel) % quantity of classes
         options.maxiter uint32 = 500000 % maximum amount of iterations
         options.mex logical = true % uses the mex version
-        options.seed int32 = -1 % random seed
+        options.useseed logical = false % do not set seed
+        options.seed int32 = 0 % random seed
+        options.Xgraph = false % X is a feature matrix
     end     
 
+    % if the input X is a feature matrix (default)
+    if options.Xgraph == false
+        % call the function to build the graph
+        G = pcc_buildgraph(double(X),k=options.k, disttype=options.disttype);
+        qtnode = size(X,1); % amount of nodes
+        k = options.k;
+    % if the input X is a pre-built graph
+    else        
+        G = X;
+        qtnode = size(G.KNN,1); % amount of nodes
+        k = G.k;
+    end
+
     % constants
-    potmax = 1.000; % potencial máximo
-    potmin = 0.000; % potencial mínimo
-    npart = sum(slabel~=0); % quantidade de partículas
-    qtnode = size(X,1);
-    stopmax = round((qtnode/double(npart*options.k))*round(options.valpha*0.1)); % qtde de iterações para verificar convergência  
-    % normalizar atributos se necessário
-    if strcmp(options.disttype,'seuclidean')==1
-        X = zscore(X);
-        options.disttype='euclidean';
-    end
-    % encontrando k-vizinhos mais próximos      
-    KNN = uint32(knnsearch(X,X,'K',options.k+1,'NSMethod','kdtree','Distance',options.disttype));
-    KNN = KNN(:,2:end); % eliminando o elemento como vizinho de si mesmo
-    KNN(:,end+1:end+options.k) = 0;
-    knns = repmat(options.k,qtnode,1); % vetor com a quantidade de vizinhos de cada nó       
-    for i=1:qtnode
-        KNN(sub2ind(size(KNN),KNN(i,1:options.k),(knns(KNN(i,1:options.k))+1)'))=i; % adicionando i como vizinho dos vizinhos de i (criando reciprocidade)
-        knns(KNN(i,1:options.k))=knns(KNN(i,1:options.k))+1; % aumentando contador de vizinhos nos nós que tiveram vizinhos adicionados
-        if max(knns)==size(KNN,2) % se algum nó atingiu o limite de colunas da matriz de vizinhança recíproca teremos de aumentá-la
-            KNN(:,max(knns)+1:round(max(knns)*1.1)+1) = zeros(qtnode,round(max(knns)*0.1)+1,'uint32');  % portanto vamos aumenta-la em 10% + 1 (para garantir no caso do tamanho ser menor que 10)            
-        end
-    end
-    % removendo duplicatas    
-    for i=1:qtnode
-        knnrow = unique(KNN(i,:),'stable'); % remove as duplicatas
-        knns(i) = size(knnrow,2)-1; % atualiza quantidade de vizinhos (e descarta o zero no final)
-        KNN(i,1:knns(i)) = knnrow(1:end-1); % copia para matriz KNN
-        %KNN(i,knns(i)+1:end) = 0; % preenche espaços não usados por zero,
-        %apenas para debug pois na prática não faz diferença visto que knns
-        %já dirá quais são os vizinhos válidos da lista
-    end    
-    KNN = KNN(:,1:max(knns)); % eliminando colunas que não tem vizinhos válidos
-    % definindo classe de cada partícula
-    partclass = slabel(slabel~=0);
-    % definindo nó casa da partícula
-    partnode = uint32(find(slabel));
-    % definindo potencial da partícula em 1
-    potpart = ones(potmax,npart);       
-    % ajustando todas as distâncias na máxima possível
-    distnode = repmat(min(intmax('uint8'),uint8(qtnode-1)),qtnode,npart);
-    % ajustando para zero a distância de cada partícula para seu
-    % respectivo nó casa
-    distnode(sub2ind(size(distnode),partnode',1:npart)) = 0;
-    % inicializando tabela de potenciais com tudo igual
-    pot = repmat(potmax/double(options.nclass),qtnode,options.nclass);
-    % zerando potenciais dos nós rotulados
-    pot(partnode,:) = 0;
-    % ajustando potencial da classe respectiva do nó rotulado para 1
-    pot(sub2ind(size(pot),partnode,slabel(partnode))) = 1;
-    % colocando cada nó em sua casa
-    partpos = partnode;           
-    % definindo grau de propriedade
-    owndeg = repmat(realmin,qtnode,options.nclass);  % não podemos usar 0, porque nós não visitados dariam divisão por 0
+    potmax = 1.000; % maximum dominance level
+    potmin = 0.000; % minimum dominance level
+    npart = sum(slabel~=0); % amount of particles
     
+    % amount of iterations to check for convergence
+    stopmax = round((qtnode/double(npart*k))*round(options.valpha*0.1));
+
+    % definining the class of each particle
+    partclass = slabel(slabel~=0);
+    % defining the home node of each particle
+    partnode = uint32(find(slabel));
+    % definindo the strength of each particle to 1
+    potpart = ones(potmax,npart);       
+    % adjusting all distance in particles distance tables to the maximum
+    distnode = repmat(min(intmax('uint8'),uint8(qtnode-1)),qtnode,npart);
+    % adjusting to zero the distance of each particle to its home node
+    distnode(sub2ind(size(distnode),partnode',1:npart)) = 0;
+    % initializing all the dominance vectors with the same levels (1/amount
+    % of classes)
+    pot = repmat(potmax/double(options.nclass),qtnode,options.nclass);
+    % zero-ing the dominance vectors of labeled nodes
+    pot(partnode,:) = 0;
+    % ajusting the dominance vector of the nodes' classes to 1
+    pot(sub2ind(size(pot),partnode,slabel(partnode))) = 1;
+    % putting each particle in its home node
+    partpos = partnode;           
+    % initializing the accumlated dominance vectors
+    % we can't use 0, otherwise non-visited nodes would trigger a division
+    % by zero.
+    owndeg = repmat(realmin,qtnode,options.nclass);  
+    
+    % if the mex version was chosen
     if options.mex==true    
         pccloop(options.maxiter, npart, options.nclass, stopmax, options.pgrd, ...
             options.dexp, options.deltav, options.deltap, potmin, partnode, ... 
-            partclass, potpart, slabel, knns, distnode, KNN, pot, owndeg, options.seed);
+            partclass, potpart, slabel, G.knns, distnode, G.KNN, ...
+            pot, owndeg, options.useseed, options.seed);
+    % if the non-mex version was chosen
     else
         % if a seed was provided in the options, use it.
-        if options.seed>0
+        if options.useseed==true
             rng(options.seed)
         end
         % variável para guardar máximo potencial mais alto médio
@@ -146,34 +146,34 @@ function [owner, pot, owndeg, distnode] = pcc(X, slabel, options)
                 ppj = partpos(j);
                 if rndtb(j)<options.pgrd
                     % regra de probabilidade
-                    prob = cumsum((1./(1+double(distnode(KNN(ppj,1:knns(ppj)),j))).^options.dexp)'.* pot(KNN(ppj,1:knns(ppj)),partclass(j))');
+                    prob = cumsum((1./(1+double(distnode(G.KNN(ppj,1:G.knns(ppj)),j))).^options.dexp)'.* pot(G.KNN(ppj,1:G.knns(ppj)),partclass(j))');
                     % descobrindo quem foi o nó sorteado
-                    k = KNN(ppj,find(prob>=(roulettepick(j)*prob(end)),1,'first'));
+                    picked = G.KNN(ppj,find(prob>=(roulettepick(j)*prob(end)),1,'first'));
                 else
-                    k = KNN(ppj,ceil(roulettepick(j)*double(knns(ppj))));
+                    picked = G.KNN(ppj,ceil(roulettepick(j)*double(G.knns(ppj))));
                     % contador de visita (para calcular grau de propriedade)
-                    owndeg(k,partclass(j)) = owndeg(k,partclass(j)) + potpart(j);
+                    owndeg(picked,partclass(j)) = owndeg(picked,partclass(j)) + potpart(j);
                 end           
                 % se o nó não é pré-rotulado
-                if slabel(k)==0
+                if slabel(picked)==0
                     % calculando novos potenciais para nó
-                    deltapotpart = pot(k,:) - max(potmin,pot(k,:) - potpart(j)*(options.deltav/(double(options.nclass)-1)));
-                    pot(k,:) = pot(k,:) - deltapotpart;
-                    pot(k,partclass(j)) = pot(k,partclass(j)) + sum(deltapotpart);
+                    deltapotpart = pot(picked,:) - max(potmin,pot(picked,:) - potpart(j)*(options.deltav/(double(options.nclass)-1)));
+                    pot(picked,:) = pot(picked,:) - deltapotpart;
+                    pot(picked,partclass(j)) = pot(picked,partclass(j)) + sum(deltapotpart);
                 end
                 % atribui novo potencial para partícula
-                potpart(j) = potpart(j) + (pot(k,partclass(j))-potpart(j))*options.deltap;
+                potpart(j) = potpart(j) + (pot(picked,partclass(j))-potpart(j))*options.deltap;
                           
                 % se distância do nó alvo maior que distância do nó atual + 1
-                if distnode(partpos(j),j)+1<distnode(k,j)
+                if distnode(partpos(j),j)+1<distnode(picked,j)
                     % atualizar distância do nó alvo
-                    distnode(k,j) = distnode(partpos(j),j)+1;
+                    distnode(picked,j) = distnode(partpos(j),j)+1;
                 end
                 
                 % se não houve choque
-                if pot(k,partclass(j))>=max(pot(k,:))
+                if pot(picked,partclass(j))>=max(pot(picked,:))
                     % muda para nó alvo
-                    partpos(j) = k;
+                    partpos(j) = picked;
                 end
             end
             if mod(i,10)==0

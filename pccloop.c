@@ -33,7 +33,8 @@ extern errno_t rand_s (unsigned int *randomValue);
 #define nlist_IN        prhs[15]
 #define pot_IN          prhs[16]
 #define owndeg_IN       prhs[17]
-#define seed_IN         prhs[18]
+#define useseed_IN      prhs[18]
+#define seed_IN         prhs[19]
 
 void mexFunction( int nlhs, mxArray *plhs[], 
 		  int nrhs, const mxArray*prhs[] )    
@@ -48,13 +49,15 @@ void mexFunction( int nlhs, mxArray *plhs[],
     unsigned int *nlist; // matrizes de int
     unsigned char *distnode;
     double *pot, *owndeg;  // matrizes de double
-    int qtnode, neibmax, seed;
+    int qtnode, neibmax;
+    bool useseed;
+    unsigned int seed;    
     
     /* Check for proper number of arguments */
     
     
-    if (nrhs != 19) { 
-	    mexErrMsgTxt("19 input arguments are required."); 
+    if (nrhs != 20) { 
+	    mexErrMsgTxt("20 input arguments are required."); 
     } else if (nlhs > 0) {
 	    mexErrMsgTxt("This function no longer uses output arguments."); 
     }
@@ -78,19 +81,18 @@ void mexFunction( int nlhs, mxArray *plhs[],
     nlist = (unsigned int *) mxGetData(nlist_IN);    
     pot = mxGetPr(pot_IN);
     owndeg = mxGetPr(owndeg_IN);    
+    useseed = (bool) mxGetScalar(useseed_IN);
     
     qtnode = (int) mxGetM(slabel_IN);
     neibmax = (int) mxGetN(nlist_IN);  // quantidade máxima de vizinhos que um nó tem   
-           
+
+    if (useseed) srand(seed);
+
     // non-Windows users should probably use /dev/random or /dev/urandom instead of rand_s
     //unsigned int seed;
-    if (seed<0)
-    {
-        errno_t err;
-        err = rand_s(&seed);
-        if (err != 0) printf_s("The rand_s function failed!\n");
-    }
-    srand(seed);
+    //errno_t err;
+    //err = rand_s(&seed);
+    //if (err != 0) printf_s("The rand_s function failed!\n");
 
     double maxmmpot = 0;
     int stopcnt = 0;

@@ -1,5 +1,9 @@
 Date Format: DD/MM/YY
 
+20/07/2022:
+1) Moved the graph construction to a different function so graphs can be re-used. An existing graph can be passed to PCC. Check the new Xgraph option. pcc_buildgraph() can be called separately.
+2) Seed usage changed. Now it uses two options. This allows negative seeds to be sent to the Mex version. Notice that the non-mex version uses Matlab rng() function which only allows non-negative seeds.
+
 19/07/2022:
 1) Options are now labeled arguments. Matlab R2019b or higher is required.
 2) seed option to allow reproducibility. Default is no seed.
