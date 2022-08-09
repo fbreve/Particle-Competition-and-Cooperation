@@ -11,7 +11,7 @@
 #include <math.h>
 #include "mex.h"
 /* to avoid the warning on rand_s when compiling with MinGW */
-extern errno_t rand_s (unsigned int *randomValue);
+//extern errno_t rand_s (unsigned int *randomValue);
 
 /* Input Arguments */
 
@@ -84,7 +84,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
     useseed = (bool) mxGetScalar(useseed_IN);
     
     qtnode = (int) mxGetM(slabel_IN);
-    neibmax = (int) mxGetN(nlist_IN);  // quantidade máxima de vizinhos que um nó tem   
+    neibmax = (int) mxGetN(nlist_IN);  // quantidade mÃ¡xima de vizinhos que um nÃ³ tem   
 
     if (useseed) srand(seed);
 
@@ -117,14 +117,14 @@ void mexFunction( int nlhs, mxArray *plhs[],
                     //printf("%0.10f\n",prob[i2]);
                 }               
             }
-            else // movimento aleatório        
+            else // movimento aleatÃ³rio        
             {
                 greedymov=0;
-                //printf("movimento aleatório\n");                
+                //printf("movimento aleatÃ³rio\n");                
                 for(int i2=0; i2<nsize[partpos[j]-1]; i2++) prob[i2] = 1;
                 probsum = nsize[partpos[j]-1];                        
             }
-            // vamos encontrar o nó sorteado
+            // vamos encontrar o nÃ³ sorteado
             r = ((double) rand()) * probsum / RAND_MAX;
             //printf("ProbSum: %0.4f\n",probsum);           
             //printf("r:       %0.4f\n",r);
@@ -137,20 +137,20 @@ void mexFunction( int nlhs, mxArray *plhs[],
             }            
             
             //printf("K Sorteado: %i de %i\n",k,(int) nsize[(int) partpos[j]-1]);
-            // convertendo o índice de probabilidade sorteado no índice do nó sorteado
+            // convertendo o Ã­ndice de probabilidade sorteado no Ã­ndice do nÃ³ sorteado
             k = nlist[(k*qtnode + partpos[j]-1)];
             //printf("Vizinho sorteado: %i\n",k);
                        
-            // se o nó não é rotulado vamos ajustar os potenciais
+            // se o nÃ³ nÃ£o Ã© rotulado vamos ajustar os potenciais
             if (slabel[k-1]==0)
             {
                 // valor a ser retirado de cada potencial de outras classes
                 double deltapotpartind = potpart[j] * (deltav/(nclass-1));
-                // valor total a ser acrescentado no potencial da classe da partícula
+                // valor total a ser acrescentado no potencial da classe da partÃ­cula
                 double deltapotpart = potpart[j] * deltav;
                 for(int i2=0; i2<nclass; i2++)
                 {                                        
-                    if (i2==partclass[j]-1) continue; // não fazer para a classe da partícula
+                    if (i2==partclass[j]-1) continue; // nÃ£o fazer para a classe da partÃ­cula
                     pot[(i2*qtnode + k-1)] -= deltapotpartind;                        
                     // se o potencial ficou abaixo de zero
                     if(pot[(int) (i2*qtnode + k-1)]<0)
@@ -161,38 +161,38 @@ void mexFunction( int nlhs, mxArray *plhs[],
                         pot[(i2*qtnode + k-1)] = 0;
                     }                    
                 }
-                // agora acrescenta o deltapotpart no potencial da classe da partícula
+                // agora acrescenta o deltapotpart no potencial da classe da partÃ­cula
                 pot[((partclass[j]-1) * qtnode + k-1)] += deltapotpart;
             }                              
-            // se foi selecionado o movimento aleatório, incrementa potencial acumulado
+            // se foi selecionado o movimento aleatÃ³rio, incrementa potencial acumulado
             if (greedymov==0)
             {
                 owndeg[((partclass[j]-1) * qtnode + k-1)] += potpart[j]; 
             }
             
-            // atribui novo potencial para partícula
+            // atribui novo potencial para partÃ­cula
             potpart[j] += (pot[((partclass[j]-1) * qtnode + k-1)] - potpart[j]) * deltap;
             //printf("%0.4f\n",potpart[j]);
             
-            // se distância do nó alvo maior que distância do nó atual + 1
+            // se distÃ¢ncia do nÃ³ alvo maior que distÃ¢ncia do nÃ³ atual + 1
             //printf("%i\n",(int) distnode[(int) (j*qtnode + k-1)]);
             if (distnode[(j * qtnode + partpos[j]-1)]+1 < distnode[(j*qtnode + k-1)])
-                // atualizar distância do nó alvo
+                // atualizar distÃ¢ncia do nÃ³ alvo
                 distnode[(j*qtnode + k-1)] = distnode[(j*qtnode + partpos[j]-1)]+1;
             
             
-            // se não houve choque, atualizar posição da partícula            
-            // primeiro temos que encontrar o valor máximo de potencial do nó alvo
+            // se nÃ£o houve choque, atualizar posiÃ§Ã£o da partÃ­cula            
+            // primeiro temos que encontrar o valor mÃ¡ximo de potencial do nÃ³ alvo
             double maxpot = 0;
             for(int i2=0; i2<nclass; i2++)
                 if(pot[(i2 * qtnode + k-1)] > maxpot)
                     maxpot = pot[(i2 * qtnode + k-1)];
             
-            // se o valor máximo for o da classe da partícula, a partícula vai para o nó alvo
+            // se o valor mÃ¡ximo for o da classe da partÃ­cula, a partÃ­cula vai para o nÃ³ alvo
             if (pot[((partclass[j]-1) * qtnode + k-1)] >= maxpot)
                 partpos[j] = k;
         }
-        // vamos testar convergência
+        // vamos testar convergÃªncia
         if (i % 10 == 0)
         {
             double mmpot = 0;
