@@ -19,6 +19,8 @@
 % k         - Each node is connected to its k-neirest neighbors. Default:
 %             size of the dataset multiplied by 0.05.
 % disttype  - Use 'euclidean', 'seuclidean', etc. Default: 'euclidean'
+% earlystop - Default: true.  Early stop is adjusted by 'valpha'. Set it 
+%             to false to run exactly 'maxiter' iterations.
 % valpha    - Lower it to stop earlier, accuracy may be lower. Default:
 %             2000.
 % pgrd      - Check p_grd in [1]. Default: 0.5.
@@ -64,6 +66,7 @@ function [owner, pot, owndeg, distnode] = pcc(X, slabel, options)
         slabel uint16
         options.k uint16 = size(X,1)*0.05
         options.disttype string = 'euclidean'
+        options.earlystop logical = true
         options.valpha double = 2000
         options.pgrd double = 0.500 % probability of taking the greedy movement
         options.deltav double = 0.100 % controls node domination levels increase/decrease rate
@@ -124,10 +127,11 @@ function [owner, pot, owndeg, distnode] = pcc(X, slabel, options)
     
     % if the mex version was chosen
     if options.mex==true    
-        pccloop(options.maxiter, npart, options.nclass, stopmax, options.pgrd, ...
-            options.dexp, options.deltav, options.deltap, potmin, partnode, ... 
-            partclass, potpart, slabel, G.knns, distnode, G.KNN, ...
-            pot, owndeg, options.useseed, options.seed);
+        pccloop(options.maxiter, npart, options.nclass, options.earlystop, ...
+            stopmax, options.pgrd, options.dexp, options.deltav, ...
+            options.deltap, potmin, partnode, partclass, potpart, ...
+            slabel, G.knns, distnode, G.KNN, pot, owndeg, ...
+            options.useseed, options.seed);
     % if the non-mex version was chosen
     else
         % if a seed was provided in the options, use it.
@@ -176,7 +180,7 @@ function [owner, pot, owndeg, distnode] = pcc(X, slabel, options)
                     partpos(j) = picked;
                 end
             end
-            if mod(i,10)==0
+            if options.earlystop==true && mod(i,10)==0
                 mmpot = mean(max(pot,[],2));
                 %disp(sprintf('Iter: %5.0f  Meanpot: %0.4f',i,mmpot))
                 if mmpot>maxmmpot
@@ -184,7 +188,7 @@ function [owner, pot, owndeg, distnode] = pcc(X, slabel, options)
                     stopcnt = 0;
                 else    
                     stopcnt = stopcnt + 1;
-                    if stopcnt > stopmax
+                    if stopcnt > stopmax                        
                         break;
                     end
                 end

@@ -18,23 +18,24 @@
 #define	maxiter_IN      prhs[0]
 #define	npart_IN        prhs[1]
 #define	nclass_IN       prhs[2]
-#define	stopmax_IN      prhs[3]
-#define	pgrd_IN         prhs[4]
-#define	dexp_IN         prhs[5]
-#define	deltav_IN       prhs[6]
-#define	deltap_IN       prhs[7]
-#define potmin_IN       prhs[8]
-#define partpos_IN      prhs[9]
-#define partclass_IN 	prhs[10]
-#define potpart_IN      prhs[11]
-#define slabel_IN       prhs[12]
-#define nsize_IN        prhs[13]
-#define distnode_IN     prhs[14]
-#define nlist_IN        prhs[15]
-#define pot_IN          prhs[16]
-#define owndeg_IN       prhs[17]
-#define useseed_IN      prhs[18]
-#define seed_IN         prhs[19]
+#define earlystop_IN    prhs[3]
+#define	stopmax_IN      prhs[4]
+#define	pgrd_IN         prhs[5]
+#define	dexp_IN         prhs[6]
+#define	deltav_IN       prhs[7]
+#define	deltap_IN       prhs[8]
+#define potmin_IN       prhs[9]
+#define partpos_IN      prhs[10]
+#define partclass_IN 	prhs[11]
+#define potpart_IN      prhs[12]
+#define slabel_IN       prhs[13]
+#define nsize_IN        prhs[14]
+#define distnode_IN     prhs[15]
+#define nlist_IN        prhs[16]
+#define pot_IN          prhs[17]
+#define owndeg_IN       prhs[18]
+#define useseed_IN      prhs[19]
+#define seed_IN         prhs[20]
 
 void mexFunction( int nlhs, mxArray *plhs[], 
 		  int nrhs, const mxArray*prhs[] )    
@@ -50,14 +51,14 @@ void mexFunction( int nlhs, mxArray *plhs[],
     unsigned char *distnode;
     double *pot, *owndeg;  // matrizes de double
     int qtnode, neibmax;
-    bool useseed;
+    bool useseed, earlystop;
     unsigned int seed;    
     
     /* Check for proper number of arguments */
     
     
-    if (nrhs != 20) { 
-	    mexErrMsgTxt("20 input arguments are required."); 
+    if (nrhs != 21) { 
+	    mexErrMsgTxt("21 input arguments are required."); 
     } else if (nlhs > 0) {
 	    mexErrMsgTxt("This function no longer uses output arguments."); 
     }
@@ -65,6 +66,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
     maxiter = (int) mxGetScalar(maxiter_IN);
     npart = (int) mxGetScalar(npart_IN);
     nclass = (int) mxGetScalar(nclass_IN);
+    earlystop = (bool) mxGetScalar(earlystop_IN);
     stopmax = (int) mxGetScalar(stopmax_IN);
     seed = (int) mxGetScalar(seed_IN);
     pgrd = mxGetScalar(pgrd_IN);
@@ -193,7 +195,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
                 partpos[j] = k;
         }
         // vamos testar convergência
-        if (i % 10 == 0)
+        if (earlystop && i % 10 == 0)
         {
             double mmpot = 0;
             for(int i2=0; i2<qtnode; i2++)
