@@ -5,7 +5,8 @@
 % OPTIONS:
 % k         - Each node is connected to its k-neirest neighbors. Default:
 %             size of the dataset multiplied by 0.05.
-% disttype  - Use 'euclidean', 'seuclidean', etc. Default: 'euclidean'
+% disttype  - Use 'euclidean', 'seuclidean', etc. Default: 'euclidean'.
+%             See the MATLAB knnsearch funcion help for all the options.
 %
 % OUTPUT:
 % pcc_graph - structure containing KNN and knns
@@ -22,14 +23,8 @@ function pcc_graph = pcc_buildgraph(X, options)
     end     
 
     qtnode = size(X,1);
-    % normalize features if standardized Euclidean is chosen as distance
-    % type
-    if strcmp(options.disttype,'seuclidean')==1
-        X = zscore(X);
-        options.disttype='euclidean';
-    end
     % find the k-nearest neighbors
-    KNN = uint32(knnsearch(X,X,'K',options.k+1,'NSMethod','kdtree','Distance',options.disttype));
+    KNN = uint32(knnsearch(X,X,'K',options.k+1,'Distance',options.disttype));
     % eliminate the self-loops
     KNN = KNN(:,2:end); 
     % make room for reciprocal connections

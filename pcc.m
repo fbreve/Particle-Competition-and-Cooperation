@@ -18,7 +18,8 @@
 % OPTIONS:
 % k         - Each node is connected to its k-neirest neighbors. Default:
 %             size of the dataset multiplied by 0.05.
-% disttype  - Use 'euclidean', 'seuclidean', etc. Default: 'euclidean'
+% disttype  - Use 'euclidean', 'seuclidean', etc. Default: 'euclidean'.
+%             See the MATLAB knnsearch funcion help for all the options.
 % earlystop - Default: true.  Early stop is adjusted by 'valpha'. Set it 
 %             to false to run exactly 'maxiter' iterations.
 % valpha    - Lower it to stop earlier, accuracy may be lower. Default:

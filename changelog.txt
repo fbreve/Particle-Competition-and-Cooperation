@@ -1,18 +1,30 @@
 Date Format: DD/MM/YY
 
+05/12/2025:
+No longer enforces the knnsearch nearest neighbor search method to 
+'kdtree'. It is better to not set it and let MATLAB choose based on its
+own criteria. It basically chooses 'kdtree' when the number of features
+is 10 or less and 'exhaustive' otherwise. For some distance functions, 
+including 'seuclidean', 'exhaustive' is the only option.
+
 20/07/2022:
-1) Moved the graph construction to a different function so graphs can be re-used. An existing graph can be passed to PCC. Check the new Xgraph option. pcc_buildgraph() can be called separately.
-2) Seed usage changed. Now it uses two options. This allows negative seeds to be sent to the Mex version. Notice that the non-mex version uses Matlab rng() function which only allows non-negative seeds.
+1) Moved the graph construction to a different function so graphs can be
+re-used. An existing graph can be passed to PCC. Check the new Xgraph
+option. pcc_buildgraph() can be called separately.
+2) Seed usage changed. Now it uses two options. This allows negative seeds
+to be sent to the MEX version. Notice that the non-MEX version uses MATLAB
+rng() function which only allows non-negative seeds.
 
 19/07/2022:
-1) Options are now labeled arguments. Matlab R2019b or higher is required.
+1) Options are now labeled arguments. MATLAB R2019b or higher is required.
 2) seed option to allow reproducibility. Default is no seed.
-3) pccmex and pcc joined in a single function, an option is used to choose between them. Mex is the default one.
+3) pccmex and pcc joined in a single function, an option is used to choose
+between them. MEX is the default one.
 
 07/10/2020:
 - Changed the stop criterion to be less conservative. It now considers the
-amount of nodes, the amound of particles and also the amount of k-nearest 
+amount of nodes, the amount of particles and also the amount of k-nearest 
 neighbors in the graph construction to calculate how many iterations it 
-should wait on the "stable" phase before it stops. k-nearest neighbors gives a
-clue on how connected the network is, we usually need less "stable" iterations
-in more connected networks.
+should wait on the "stable" phase before it stops. k-nearest neighbors 
+gives a clue on how connected the network is, we usually need less "stable"
+iterations in more connected networks.
