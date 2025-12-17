@@ -34,7 +34,7 @@ disp(cm);
 % If you have other operating system you need to compile it yourself using:  
 % mex pccloop.c
 
-disp('Running the algorithm MEX implementation, which is ~10 times faster than the pure Matlab implementation...');
+disp('Running the algorithm MEX implementation, which is ~30 times faster than the pure Matlab implementation...');
 disp('Parameters k: 10, distance: Normalized Euclidean, others: Default.');
 tStart = tic;
 owner = pcc(X, slabel, k=10, disttype='seuclidean', mex=true);
