@@ -109,7 +109,7 @@ function [owner, pot, owndeg, distnode] = pcc(X, slabel, options)
     % defining the home node of each particle
     partnode = uint32(find(slabel));
     % definindo the strength of each particle to 1
-    potpart = ones(potmax,npart);       
+    potpart = ones(1,npart);       
     % adjusting all distance in particles distance tables to the maximum
     distnode = repmat(min(intmax('uint8'),uint8(qtnode-1)),qtnode,npart);
     % adjusting to zero the distance of each particle to its home node
