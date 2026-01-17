@@ -1,5 +1,14 @@
 Date Format: DD/MM/YY
 
+17/01/2026:
+- Benchmark updated to include the Digits dataset.
+
+19/12/2026:
+- Small code improvements.
+
+17/12/2026:
+- Benchmark included.
+
 05/12/2025:
 No longer enforces the knnsearch nearest neighbor search method to 
 'kdtree'. It is better to not set it and let MATLAB choose based on its
