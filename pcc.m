@@ -154,13 +154,19 @@ function [owner, pot, owndeg, distnode] = pcc(X, slabel, options)
                 if rndtb(j)<options.pgrd
                     % regra de probabilidade
                     prob = cumsum((1./(1+double(distnode(G.KNN(ppj,1:G.knns(ppj)),j))).^options.dexp)'.* pot(G.KNN(ppj,1:G.knns(ppj)),partclass(j))');
-                    % descobrindo quem foi o nó sorteado
-                    picked = G.KNN(ppj,find(prob>=(roulettepick(j)*prob(end)),1,'first'));
+                    % se todos os vizinhos têm dominância zero, cai no movimento aleatório
+                    if prob(end) == 0
+                        picked = G.KNN(ppj,ceil(roulettepick(j)*double(G.knns(ppj))));
+                        owndeg(picked,partclass(j)) = owndeg(picked,partclass(j)) + potpart(j);
+                    else
+                        % descobrindo quem foi o nó sorteado
+                        picked = G.KNN(ppj,find(prob>=(roulettepick(j)*prob(end)),1,'first'));
+                    end
                 else
                     picked = G.KNN(ppj,ceil(roulettepick(j)*double(G.knns(ppj))));
                     % contador de visita (para calcular grau de propriedade)
                     owndeg(picked,partclass(j)) = owndeg(picked,partclass(j)) + potpart(j);
-                end           
+                end
                 % se o nó não é pré-rotulado
                 if slabel(picked)==0
                     % calculando novos potenciais para nó
@@ -201,4 +207,3 @@ function [owner, pot, owndeg, distnode] = pcc(X, slabel, options)
     [~,owner] = max(pot,[],2);
     owndeg = owndeg ./ repmat(sum(owndeg,2),1,options.nclass);
 end
-
