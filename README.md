@@ -110,7 +110,7 @@ If you use this implementation in research, please cite the original article:
 
 ```bibtex
 @article{breve2012particle,
-  author  = {Breve, Fabricio Aparecido and Zhao, Liang and Quiles, Marcos Gon{\"c}alves and Pedrycz, Witold and Liu, Jiming},
+  author  = {Breve, Fabricio Aparecido and Zhao, Liang and Quiles, Marcos Gon{\c{c}}alves and Pedrycz, Witold and Liu, Jiming},
   title   = {Particle Competition and Cooperation in Networks for Semi-Supervised Learning},
   journal = {IEEE Transactions on Knowledge and Data Engineering},
   volume  = {24},
