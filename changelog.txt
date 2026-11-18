@@ -1,12 +1,15 @@
-Date Format: DD/MM/YY
+Date Format: DD/MM/YYYY
+
+04/03/2026:
+- Fixed the greedy-walk fallback when all neighbors have zero dominance for a particle's class. The walk now falls back to random movement and updates accumulated ownership (owndeg), instead of always selecting the first neighbor.
 
 17/01/2026:
 - Benchmark updated to include the Digits dataset.
 
-19/12/2026:
+19/12/2025:
 - Small code improvements.
 
-17/12/2026:
+17/12/2025:
 - Benchmark included.
 
 05/12/2025:
@@ -25,7 +28,7 @@ to be sent to the MEX version. Notice that the non-MEX version uses MATLAB
 rng() function which only allows non-negative seeds.
 
 19/07/2022:
-1) Options are now labeled arguments. MATLAB R2019b or higher is required.
+1) Options now use an arguments block (introduced in MATLAB R2019b). The current example and benchmark also use name=value function-call syntax, which requires MATLAB R2021a or later.
 2) seed option to allow reproducibility. Default is no seed.
 3) pccmex and pcc joined in a single function, an option is used to choose
 between them. MEX is the default one.
