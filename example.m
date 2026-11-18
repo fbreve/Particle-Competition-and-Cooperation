@@ -30,11 +30,11 @@ cm = confusionmat(owner(slabel==0),label(slabel==0));
 disp('Confusion Matrix:');
 disp(cm);
 
-% The mex implementation needs pccloop.c. It is pre-compiled for Win64. 
-% If you have other operating system you need to compile it yourself using:  
-% mex pccloop.c
+% The MEX implementation uses pccloop.c. Precompiled binaries are provided
+% for 64-bit Windows (mexw64) and Linux (mexa64). If needed, configure a
+% compatible compiler and rebuild with: mex pccloop.c
 
-disp('Running the algorithm MEX implementation, which is ~30 times faster than the pure Matlab implementation...');
+disp('Running the accelerated MEX implementation (speedup depends on system and settings)...');
 disp('Parameters k: 10, distance: Normalized Euclidean, others: Default.');
 tStart = tic;
 owner = pcc(X, slabel, k=10, disttype='seuclidean', mex=true);
