@@ -1,6 +1,6 @@
-% benchmark_pcc.m
-% Benchmark PCC: pure MATLAB vs MEX, com 100 splits diferentes de pré-rotulados
-% Baseado no exemplo original do Wine.
+% benchmark.m
+% Benchmark PCC: pure MATLAB vs MEX, with repeated pre-labeled splits.
+% Based on the original Wine example, extended to the Digits dataset.
 %
 % Some results:
 %
