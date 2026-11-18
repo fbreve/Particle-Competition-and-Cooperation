@@ -1,8 +1,8 @@
 % Semi-Supervised Learning with Particle Competition and Cooperation
-% by Fabricio Breve - 21/01/2019
+% by Fabricio Breve - original version: 21/01/2019; see Git history for updates
 %
 % If you use this algorithm, please cite:
-% Breve, Fabricio Aparecido; Zhao, Liang; Quiles, Marcos GonÁalves;
+% Breve, Fabricio Aparecido; Zhao, Liang; Quiles, Marcos Gon√ßalves;
 % Pedrycz, Witold; Liu, Jiming, "Particle Competition and Cooperation in
 % Networks for Semi-Supervised Learning," Knowledge and Data Engineering,
 % IEEE Transactions on , vol.24, no.9, pp.1686,1698, Sept. 2012.
@@ -16,10 +16,10 @@
 %             data item in X (use 1,2,3,... for labeled data items and 0
 %             for unlabeled data items)
 % OPTIONS:
-% k         - Each node is connected to its k-neirest neighbors. Default:
+% k         - Each node is connected to its k-nearest neighbors. Default:
 %             size of the dataset multiplied by 0.05.
 % disttype  - Use 'euclidean', 'seuclidean', etc. Default: 'euclidean'.
-%             See the MATLAB knnsearch funcion help for all the options.
+%             See the MATLAB knnsearch function help for all the options.
 % earlystop - Default: true.  Early stop is adjusted by 'valpha'. Set it 
 %             to false to run exactly 'maxiter' iterations.
 % valpha    - Lower it to stop earlier, accuracy may be lower. Default:
@@ -31,16 +31,16 @@
 % nclass    - Amount of classes on the problem. Default is the highest
 %             label number in slabel.
 % maxiter   - Maximum amount of iterations. Default is 500,000.
-% mex       - Uses the mex version of the code (compiled binary) which is
-%             ~10 times faster. Default: true. Set to false to use the 
-%             Matlab only version.
+% mex       - Uses the accelerated MEX version (compiled binary).
+%             Speedup depends on the dataset and settings; see benchmark.m.
+%             Default: true. Set to false to use pure MATLAB.
 % useseed   - Set to true if you want to use a seed to allow reproducible
 %             results. Default: false. Remember to set the seed with the
 %             seed option.
-% seed      - Seed to itialize the random number generator, which is rng()
-%             or rand_s() in non-mex and mex versions, respectively. 
-%             Default: 0. Remember to set the option useseed to true
-%             if you want the provided seed to be used. 
+% seed      - Seed to initialize the random number generator: MATLAB rng()
+%             in the non-MEX version, or C srand()/rand() in MEX.
+%             Matching seed values do not imply matching random sequences.
+%             Default: 0. Set useseed to true to use the provided seed.
 % Xgraph    - Set to true if X is a pre-built graph instead of a feature
 %             matrix.
 %
@@ -53,7 +53,7 @@
 % distnode  - matrix with the distance vectors of each particle, each
 %             column is a particle and each line is a node
 %
-% [1] BREVE, Fabricio Aparecido; Zhao, Liang; QUILES, Marcos GonÁalves;
+% [1] BREVE, Fabricio Aparecido; Zhao, Liang; QUILES, Marcos Gon√ßalves;
 % PEDRYCZ, Witold; LIU, Jiming, "Particle Competition and Cooperation in
 % Networks for Semi-Supervised Learning," Knowledge and Data Engineering,
 % IEEE Transactions on , vol.24, no.9, pp.1686,1698, Sept. 2012.
@@ -141,12 +141,12 @@ function [owner, pot, owndeg, distnode] = pcc(X, slabel, options)
         if options.useseed==true
             rng(options.seed)
         end
-        % vari·vel para guardar m·ximo potencial mais alto mÈdio
+        % vari√°vel para guardar m√°ximo potencial mais alto m√©dio
         maxmmpot = 0;
         % counter of how much times the stop criterion checked positive
         stopcnt = 0;
         for i=1:options.maxiter
-            % para cada partÌcula
+            % para cada part√≠cula
             rndtb = unifrnd(0,1,npart,1);  % probabilidade pdet
             roulettepick = unifrnd(0,1,npart,1);  % sorteio da roleta
             for j=1:npart
@@ -154,12 +154,12 @@ function [owner, pot, owndeg, distnode] = pcc(X, slabel, options)
                 if rndtb(j)<options.pgrd
                     % regra de probabilidade
                     prob = cumsum((1./(1+double(distnode(G.KNN(ppj,1:G.knns(ppj)),j))).^options.dexp)'.* pot(G.KNN(ppj,1:G.knns(ppj)),partclass(j))');
-                    % se todos os vizinhos tÍm domin‚ncia zero, cai no movimento aleatÛrio
+                    % se todos os vizinhos t√™m domin√¢ncia zero, cai no movimento aleat√≥rio
                     if prob(end) == 0
                         picked = G.KNN(ppj,ceil(roulettepick(j)*double(G.knns(ppj))));
                         owndeg(picked,partclass(j)) = owndeg(picked,partclass(j)) + potpart(j);
                     else
-                        % descobrindo quem foi o nÛ sorteado
+                        % descobrindo quem foi o n√≥ sorteado
                         picked = G.KNN(ppj,find(prob>=(roulettepick(j)*prob(end)),1,'first'));
                     end
                 else
@@ -167,25 +167,25 @@ function [owner, pot, owndeg, distnode] = pcc(X, slabel, options)
                     % contador de visita (para calcular grau de propriedade)
                     owndeg(picked,partclass(j)) = owndeg(picked,partclass(j)) + potpart(j);
                 end
-                % se o nÛ n„o È prÈ-rotulado
+                % se o n√≥ n√£o √© pr√©-rotulado
                 if slabel(picked)==0
-                    % calculando novos potenciais para nÛ
+                    % calculando novos potenciais para n√≥
                     deltapotpart = pot(picked,:) - max(potmin,pot(picked,:) - potpart(j)*(options.deltav/(double(options.nclass)-1)));
                     pot(picked,:) = pot(picked,:) - deltapotpart;
                     pot(picked,partclass(j)) = pot(picked,partclass(j)) + sum(deltapotpart);
                 end
-                % atribui novo potencial para partÌcula
+                % atribui novo potencial para part√≠cula
                 potpart(j) = potpart(j) + (pot(picked,partclass(j))-potpart(j))*options.deltap;
                           
-                % se dist‚ncia do nÛ alvo maior que dist‚ncia do nÛ atual + 1
+                % se dist√¢ncia do n√≥ alvo maior que dist√¢ncia do n√≥ atual + 1
                 if distnode(partpos(j),j)+1<distnode(picked,j)
-                    % atualizar dist‚ncia do nÛ alvo
+                    % atualizar dist√¢ncia do n√≥ alvo
                     distnode(picked,j) = distnode(partpos(j),j)+1;
                 end
                 
-                % se n„o houve choque
+                % se n√£o houve choque
                 if pot(picked,partclass(j))>=max(pot(picked,:))
-                    % muda para nÛ alvo
+                    % muda para n√≥ alvo
                     partpos(j) = picked;
                 end
             end
