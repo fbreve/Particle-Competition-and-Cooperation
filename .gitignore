@@ -1,0 +1,19 @@
+# MATLAB editor backups and autosave files
+*.asv
+*.m~
+*~
+
+# Local and temporary backup files
+*.bak
+*.tmp
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# MATLAB/Simulink generated files and build directories
+slprj/
+codegen/
+
+# Keep distributed MEX binaries and example datasets versioned.
+# Ignored patterns do not remove files already tracked in Git.
